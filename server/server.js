@@ -92,25 +92,8 @@ app.put('/item', (req, res) => {
 });
 
 app.all('/mongoseed', (req, res) => {
-  timer.start();
-  let n = 100000 //number of items per seed
-  let max = 10; //number of rounds of seeding
-
-  console.log('seeds left: ', max);
-  max--;
-  mongooseDBSeed(n);
-  let interval = setInterval(() => {
-    console.log('seeds left: ', max);
-    mongooseDBSeed(n);
-    max--;
-    if (max === 0){
-      timer.stop();
-      clearInterval(interval);
-      console.log(`Database seed completed in ${timer.seconds()} seconds`);
-    }
-  }, 12000);
-
-  res.send('database seed attempted');
+  mongooseDBSeed(300000)
+  res.send('database seed attempted using mongoose/mongoDB');
 })
 
 app.all('/postgresqlSeed', (req, res) => {

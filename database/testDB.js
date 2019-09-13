@@ -2,7 +2,6 @@ const { carouselItem } = require('../database/mongoose.js');
 const mongoose = require('mongoose');
 var faker = require('faker');
 const timerFn = require('timer-node');
-const timer = timerFn('test-timer');
 
 const createItemArray = (max) => {
 
@@ -24,19 +23,43 @@ const createItemArray = (max) => {
 }
 
 const mongooseDBSeed = (max) => {
-
+  const timer = timerFn('test-timer');
   timer.start();
+  let n = max //number of items per seed
+  let seedsPerRound = 100000;
+  let rounds = max / 100000; //number of rounds of seeding
+  console.log(`Beginning seed with ${rounds} rounds`)
+
+  console.log('seeds left: ', rounds);
+  rounds--;
+  mongooseSeeder(seedsPerRound);
+  let interval = setInterval(() => {
+    if (rounds === 0){
+      timer.stop();
+      clearInterval(interval);
+      console.log(`Database seed completed in ${timer.seconds()} seconds`);
+    } else {
+      console.log('seeds left: ', rounds);
+      mongooseSeeder(seedsPerRound);
+      rounds--;
+    }
+  }, 12000);
+}
+
+const mongooseSeeder = (max) => {
+  const timer2 = timerFn('test-timer');
+  timer2.start();
 
   let itemArray = createItemArray(max);
 
-  timer.stop();
-  console.log(`Array loaded in ${timer.seconds()} seconds.`)
-  timer.start();
+  timer2.stop();
+  console.log(`Array loaded in ${timer2.seconds()} seconds.`)
+  timer2.start();
 
   carouselItem.collection.bulkWrite(itemArray)
   .then((res)=> {
-    timer.stop();
-    console.log(`${res.insertedCount} items inserted in ${timer.seconds()} seconds.`)
+    timer2.stop();
+    console.log(`${res.insertedCount} items inserted in ${timer2.seconds()} seconds.`)
   })
 }
 
