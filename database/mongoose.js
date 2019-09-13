@@ -10,7 +10,6 @@ connection.once('open', function () {
 });
 
 const schema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   ProductId: Number,
   ItemName: String,
   Price: Number,
@@ -18,8 +17,8 @@ const schema = new mongoose.Schema({
   RatingCount: Number,
   Category: String,
   Photo: String
-}, {collection: 'item-data' });
+});
 
-const carouselItem = mongoose.model('carouselItem', schema);
+const carouselItem = mongoose.model('carousel-items', schema);
 
 module.exports = { carouselItem };

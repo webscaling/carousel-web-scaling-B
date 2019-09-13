@@ -7,7 +7,7 @@ class Carousel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      globalId: 38,
+      globalId: 338,
       pageReload: false,
       globalCategory: '',
       itemData: [],
@@ -38,7 +38,7 @@ class Carousel extends Component {
     window.addEventListener('reviewUpdate', this.updateReview.bind(this));
   }
   updateReview(event) {
-    axios.put('http://18.191.49.198/item', {
+    axios.put('/item', {
       ProductId: this.state.globalId,
       Rating: event.detail.reviewsAvg,
       RatingCount: event.detail.numReviews
@@ -76,7 +76,7 @@ class Carousel extends Component {
   }
 
   getCategory() {
-    axios.get('http://18.191.49.198/item', {
+    axios.get('/item', {
       params: {
         ProductId: this.state.globalId 
       }
@@ -90,7 +90,7 @@ class Carousel extends Component {
   }
 
   getAllFromCategory(event, category) {
-    axios.get('http://18.191.49.198/item', { 
+    axios.get('/item', { 
       params: {
         Category: category
       }

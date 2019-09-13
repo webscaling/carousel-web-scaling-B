@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { carouselItem } = require('../database/mongoose.js');
 const mongoose = require('mongoose');
+const { mongooseDBSeed } = require('../database/testDB.js');
+const timerFn = require('timer-node');
+const timer = timerFn('test-timer');
 const app = express();
 const port = 4444;
 
@@ -87,6 +90,32 @@ app.put('/item', (req, res) => {
       console.error(err);
     });
 });
+
+app.all('/mongoseed', (req, res) => {
+  timer.start();
+  let n = 100000 //number of items per seed
+  let max = 10; //number of rounds of seeding
+
+  console.log('seeds left: ', max);
+  max--;
+  mongooseDBSeed(n);
+  let interval = setInterval(() => {
+    console.log('seeds left: ', max);
+    mongooseDBSeed(n);
+    max--;
+    if (max === 0){
+      timer.stop();
+      clearInterval(interval);
+      console.log(`Database seed completed in ${timer.seconds()} seconds`);
+    }
+  }, 12000);
+
+  res.send('database seed attempted');
+})
+
+app.all('/postgresqlSeed', (req, res) => {
+
+})
 
 
 
