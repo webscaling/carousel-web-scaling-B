@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { carouselItem } = require('../database/mongoose.js');
 const mongoose = require('mongoose');
-const { mongooseDBSeed } = require('../database/testDB.js');
 const timerFn = require('timer-node');
 const timer = timerFn('test-timer');
 
@@ -91,17 +90,5 @@ app.put('/item', (req, res) => {
       console.error(err);
     });
 });
-
-app.all('/mongoseed', (req, res) => {
-  mongooseDBSeed(300000)
-  res.send('database seed attempted using mongoose/mongoDB');
-})
-
-app.all('/postgresqlSeed', (req, res) => {
-
-})
-
-
-
 
 app.listen(port, () => { console.log(`we are listening from port ${port}`); });
