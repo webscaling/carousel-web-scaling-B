@@ -6,10 +6,6 @@ const { mongooseDBSeed } = require('../database/testDB.js');
 const timerFn = require('timer-node');
 const timer = timerFn('test-timer');
 
-// var workerFarm = require('worker-farm')
-//   , workers    = workerFarm(require.resolve('./child'))
-//   , ret        = 0
-
 const app = express();
 const port = 4444;
 
@@ -50,7 +46,7 @@ app.post('/item', (req, res) => {
 
 
 app.get('/item', (req, res) => {
-  carouselItem.find(req.query.Category !== undefined ? { Category: req.query.Category } : { ProductId: req.query.ProductId } )
+  carouselItem.find(req.query.Category !== undefined ? { Category: req.query.Category } : { ProductId: req.query.ProductId } ).limit(200)
     .exec()
     .then(doc => {
       res.status(200).send(doc);

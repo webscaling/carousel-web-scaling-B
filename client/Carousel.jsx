@@ -7,7 +7,7 @@ class Carousel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      globalId: 338,
+      globalId: Math.floor((Math.random() * 10000000)),
       pageReload: false,
       globalCategory: '',
       itemData: [],

@@ -37,11 +37,19 @@ const mongooseDBSeed = (max = 100000, worker, maxWorkers) => {
       console.log(`Worker ${worker} has completed seeding in ${timer.seconds()} seconds`);
       if(worker === 8){
         timer.start();
-        console.log(`Database is being indexed by worker ${worker}`);
-        carouselItem.collection.createIndex({ProductId: 1}, (err, result) => {
+        console.log(`Worker ${worker} is indexing the database by Category`);
+        carouselItem.collection.createIndex({Category: 1}, (err, result) => {
           if(err) console.error(err);
           timer.stop();
-          console.log(`Worker ${worker} has indexed the database in ${timer.seconds()} seconds`)
+          console.log(`Worker ${worker} has indexed the database by Category in ${timer.seconds()} seconds`)
+          
+          timer.start();
+          console.log(`Worker ${worker} is indexing the database by ProductId`);
+          carouselItem.collection.createIndex({ProductId: 1}, (err, result) => {
+            if(err) console.error(err);
+            timer.stop();
+            console.log(`Worker ${worker} has indexed the database by ProductId in ${timer.seconds()} seconds`)
+          })
         })
       }
     } else {
