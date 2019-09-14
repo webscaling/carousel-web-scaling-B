@@ -1,4 +1,8 @@
-const { carouselItem } = require('../database/mongoose.js');
+//The following file is meant to work with farm-cli to run multi-core seeding.
+//To activate, simply run farm database/mongoSeed.js
+//Parameter reference: https://github.com/Kikobeats/farm-cli
+
+const { carouselItem } = require('./mongoose.js');
 const mongoose = require('mongoose');
 var faker = require('faker');
 const timerFn = require('timer-node');
