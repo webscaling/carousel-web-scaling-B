@@ -5,6 +5,11 @@ const mongoose = require('mongoose');
 const { mongooseDBSeed } = require('../database/testDB.js');
 const timerFn = require('timer-node');
 const timer = timerFn('test-timer');
+
+// var workerFarm = require('worker-farm')
+//   , workers    = workerFarm(require.resolve('./child'))
+//   , ret        = 0
+
 const app = express();
 const port = 4444;
 
