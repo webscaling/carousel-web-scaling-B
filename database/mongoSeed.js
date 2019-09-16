@@ -83,6 +83,7 @@ const mongooseSeeder = (max, worker, maxWorkers, seedsPerRound, zeroIndexRound) 
 
 module.exports = function(args) {
   const {worker, maxWorkers} = args;
+  console.log(`There are ${maxWorkers} workers`)
 
   setTimeout(function() {
     mongooseDBSeed(1300000, worker + 1, maxWorkers);

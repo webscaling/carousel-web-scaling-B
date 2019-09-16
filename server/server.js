@@ -45,14 +45,18 @@ app.post('/item', (req, res) => {
 
 
 app.get('/item', (req, res) => {
-  carouselItem.find(req.query.Category !== undefined ? { Category: req.query.Category } : { ProductId: req.query.ProductId } ).limit(200)
-    .exec()
-    .then(doc => {
-      res.status(200).send(doc);
-    })
-    .catch(err => {
-      res.status(500).end();
-    });
+
+  //Mongo Route
+  // carouselItem.find(req.query.Category !== undefined ? { Category: req.query.Category } : { ProductId: req.query.ProductId } ).limit(200)
+  //   .exec()
+  //   .then(doc => {
+  //     res.status(200).send(doc);
+  //   })
+  //   .catch(err => {
+  //     res.status(500).end();
+  //   });
+
+  //Postgres
 });
 
 app.put('/seed', (req, res) => {
