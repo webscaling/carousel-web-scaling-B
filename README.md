@@ -24,7 +24,7 @@ The analysis is structured via comparisons on the following topics:
 3. Load-testing
 
 
-## Getting Started [EDIT]
+## Getting Started
 
 1. Install npm packages:
 ```
@@ -36,24 +36,22 @@ cd ./database
 touch config.js
 ```
 
-3. Decaire and export a variable that holds the uri string with the provided password to the Mongo database.
-```
-const uri = 'mongodb+srv://<password>:VUav3KFWtm7GT7bC@fec-carousel-xdbvm.mongodb.net/module-carousel?retryWrites=true&w=majority';
+3. a. If using Mongo, uncomment the Mongo section in server/server.js.
+3. b. If using Postgres, uncomment the Postgres section.
+3. c. If using Load balancing (via mongo), uncomment the 'load balancing section and edit math.random to match the number of threads that farm-cli will eventually run.
 
-module.exports = { uri };
-
-```
-
-4. Start the server:
+4. a. Start the server using npm and nodemon for 2 instances:
 ```
 npm start
 ```
 
+4. b. Start the load balancing servers using farm-cli (npm i farm-cli):
+```
+farm load-balancer/server.js
+```
 
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
+5. Go to localhost:4444 or localhost:4445 to view the app.
+
 
 ## Database Seeding
 
@@ -67,6 +65,11 @@ By itself, the single-thread node process is slow, but by using the farm-cli, we
 
 Post seeding, there is a call to index the database on two properties - the Product ID (numeric) and the Category(text). I had originally done this during seeding, calling for indexing after every 50,000 items but this had a toll on efficiency, instead I’ve used farm-cli to recognize when the last thread has performed the last seed, and then assigning that thread to perform the indexing. 
 
+To run the seed:
+```
+farm database/mongoSeed.js
+```
+
 Further optimizations:
 - If we extract the mongo process to a deployed instance, we should be able to severely reduce the seed time as we will not have to wait for the mongod process on the local machine. This seemed to be the case on the Atlas cluster but I was unable to test further as I quickly hit the free tier limits. 
 
@@ -78,6 +81,11 @@ Postgres seeding is done differently. I have designed a script that has made it 
 Indexing does not seem necessary yet as the itemID is automatically indexed as the primary key. Queries for the category are also responsive, even under load.
 
 Seeding the database is a lot faster than mongo, at around 130 seconds. 
+
+To run the seed, replace the max-old-space variable with the amount of ram you are willing to allocate to node:
+```
+node --max-old-space-size=8000 database/postgresSeed.sql
+```
 
 ## Routes
 
