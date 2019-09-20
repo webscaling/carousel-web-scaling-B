@@ -76,7 +76,14 @@ class Carousel extends Component {
   }
 
   getCategory() {
-    axios.get('/item', {
+
+    const servers = [
+      'http://127.0.0.1:4444/item',
+      'http://127.0.0.1:4445/item'
+    ]
+    let server = servers[Math.floor(Math.random() * 1)]
+
+    axios.get(server, {
       params: {
         ProductId: this.state.globalId 
       }

@@ -46,14 +46,25 @@ const writeToCSV = async () => {
 
   const timer2 = timerFn('test-timer');
   await timer2.start();
+
   let queryString = "DROP TABLE IF EXISTS carousel_items;";
   await pool.query(queryString)
-  queryString = "CREATE TABLE carousel_items ( ProductId INT PRIMARY KEY, ItemName TEXT, Price REAL, Rating INT, RatingCount INT, Category TEXT, Photo TEXT);";
+  
+  queryString = "CREATE TABLE carousel_items ( ProductId INT, ItemName TEXT, Price REAL, Rating INT, RatingCount INT, Category TEXT, Photo TEXT);";
   await pool.query(queryString)
   await console.log('Table Created')
 
   queryString = "COPY carousel_items FROM '/Users/arohan/Google Drive/Continued Education/Galvanize/Course/Shazamazon/Scale-carousel/module-the-best-carousel-master/database/data/postgresData.csv' DELIMITERS ',' CSV HEADER;";
   await pool.query(queryString)
+
+  console.log('Indexing by Product Id')
+  queryString = "CREATE UNIQUE INDEX product_id ON carousel_items (ProductId);";
+  await pool.query(queryString)
+
+  console.log('Indexing by category')
+  queryString = "CREATE INDEX category_id ON carousel_items (Category);";
+  await pool.query(queryString)
+
   await pool.end();
   
   await timer2.stop();
