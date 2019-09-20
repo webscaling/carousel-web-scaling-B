@@ -36,16 +36,18 @@ cd ./database
 touch config.js
 ```
 
-3. a. If using Mongo, uncomment the Mongo section in server/server.js.
-3. b. If using Postgres, uncomment the Postgres section.
-3. c. If using Load balancing (via mongo), uncomment the 'load balancing section and edit math.random to match the number of threads that farm-cli will eventually run.
+3. 
+a. If using Mongo, uncomment the Mongo section in server/server.js.
+b. If using Postgres, uncomment the Postgres section.
+c. If using Load balancing (via mongo), uncomment the 'load balancing section and edit math.random to match the number of threads that farm-cli will eventually run.
 
-4. a. Start the server using npm and nodemon for 2 instances:
+4. 
+a. Start the server using npm and nodemon for 2 instances:
 ```
 npm start
 ```
 
-4. b. Start the load balancing servers using farm-cli (npm i farm-cli):
+b. Start the load balancing servers using farm-cli (npm i farm-cli):
 ```
 farm load-balancer/server.js
 ```
