@@ -9,6 +9,10 @@ The carousel renders items based on two database queries. The first returns the 
 Our goal was to have our servers able to handle 300 RPS with low latency, and 1000 without crashing.
 
 
+
+
+
+
 ## On deciding between MongoDB and Postgres:
 
 In order to scale this app up, I considered two routes:
@@ -22,6 +26,10 @@ The analysis is structured via comparisons on the following topics:
 1. Database seed time
 2. Database Querying time
 3. Load-testing
+
+
+
+
 
 
 ## Getting Started
@@ -53,6 +61,9 @@ farm load-balancer/server.js
 ```
 
 5. Go to localhost:4444 or localhost:4445 to view the app.
+
+
+
 
 
 ## Database Seeding
@@ -89,6 +100,10 @@ To run the seed, replace the max-old-space variable with the amount of ram you a
 node --max-old-space-size=8000 database/postgresSeed.sql
 ```
 
+
+
+
+
 ## Routes
 
 For query and load-testing, the same route was tested on the server. However, this route sends one of two possible queries to the databases:
@@ -96,6 +111,11 @@ For query and load-testing, the same route was tested on the server. However, th
 - If a parameter is an itemid, one row/document is requested in order to extract the item’s category.
 
 - If a category is provided, 100 rows/documents are requested for other items in that category, capped by the query. Originally this was uncapped and would return all items of a category. This was then capped at 200 but I found it was a taxing query. I’ve now limited it to 100 as it produces around 17 pages of items for the user, which I think is more than enough.
+
+
+
+
+
 
 ## Query Times
 
@@ -114,6 +134,11 @@ The queries for all four db routes (routed via express in node) are listed below
 It seems mongo is more stable underload. From the above, the recommendation for load balancing would be to make sure that no server is handling more than 200 RPS.
 
 I was able to optimize Postgres a little further after looking at indexing methods, I am now indexing post-seed instead of relying on the primary key which is supposedly more performant.
+
+
+
+
+
 
 ## Load Testing
 
