@@ -172,7 +172,7 @@ app.put('/item', (req, res) => {
 });
 
 app.listen(port, () => { console.log(`we are listening from port ${port}`); });
-//app2.listen(4445, () => { console.log(`we are listening from port 4445`); });
+app2.listen(4445, () => { console.log(`we are listening from port 4445`); });
 
 // module.exports = function(args) {
 //   const {worker, maxWorkers} = args;

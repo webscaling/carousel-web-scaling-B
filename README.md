@@ -1,18 +1,30 @@
-# Shazamazon Carousel
+# A Simple Item Carousel
 
-Built using React, the Shazamazon Carousel component is one part of a larger Amazon clone. The component is able to render multiple item pictures, names, review statistics, and prices from items in the same category as the main item being viewed.  The carousel component is responsive to changes in the window's width.  While adjusting the window size, the page populates enough items to fit in the allotted space, updates the total page count, and maintains the current items on screen while the storage matrix is reconfigured. The carousel component renders a loading gif while new data is being fetched.
+Enclosed is an item carousel built in vanilla JS, modeled after popular e-commerce functionalities.
 
-## Stack
+The carousel was designed by my colleague Jeff Salinas for a larger e-commerce item page we worked on [LINK]. I had worked on the reviews module, and him on the carousel but we both decided to handle the scaling of each-other’s components.
 
-This component is built with the following technologies:
+The carousel renders items based on two database queries. The first returns the category of an item based on its Product ID, and the second returns related items that are also in that category.
 
-  - React (front-end)
-  - Express (server)
-  - MongoDB Atlas (Cloud, non-relational database)
-  - Mongoose (server/database communication)
-  - Amazon EC2 (deployment)
+Our goal was to have our servers able to handle 300 RPS with low latency, and 1000 without crashing.
 
-## Getting Started
+
+## On deciding between MongoDB and Postgres:
+
+In order to scale this app up, I considered two routes:
+1. Optimize and scale the existing Mongo database
+2. Shift to a different database entirely
+
+In this case, the database was Postgresql, as I was also interested to see if performance on a SQL based database would be more efficient.
+
+The analysis is structured via comparisons on the following topics:
+
+1. Database seed time
+2. Database Querying time
+3. Load-testing
+
+
+## Getting Started [EDIT]
 
 1. Install npm packages:
 ```
@@ -43,28 +55,59 @@ npm start
   - https://github.com/teamName/repo
   - https://github.com/teamName/repo
 
-## Table of Contents
+## Database Seeding
 
-1. [Usage](#Usage)
-1. [Requirements](#requirements)
-1. [Development](#development)
+For both Mongo and Postgres, options for seeding included uploading a csv or writing a script to populate the database. I opted to test both methods as I wanted to automate as much as possible. 
+
+### MongoDB (Seeding from Node)
+
+Here I’ve created a script (mongoSeed.js) that is able to load 10.4 million items in about five minutes. On its own, the script is able to seed 50,000 items at a time in increments. The increments exist to that the mongod process has time to write the new files to the db.
+
+By itself, the single-thread node process is slow, but by using the farm-cli, we are able to speed up the process by running several instances simultaneously. In my case, I was able to run 8 threads on my quad-core processor. 
+
+Post seeding, there is a call to index the database on two properties - the Product ID (numeric) and the Category(text). I had originally done this during seeding, calling for indexing after every 50,000 items but this had a toll on efficiency, instead I’ve used farm-cli to recognize when the last thread has performed the last seed, and then assigning that thread to perform the indexing. 
+
+Further optimizations:
+- If we extract the mongo process to a deployed instance, we should be able to severely reduce the seed time as we will not have to wait for the mongod process on the local machine. This seemed to be the case on the Atlas cluster but I was unable to test further as I quickly hit the free tier limits. 
 
 
-## Requirements
+### Postgresql (Seeding from CSV via Node)
 
-An `nvmrc` file is included if using [nvm](https://github.com/creationix/nvm).
+Postgres seeding is done differently. I have designed a script that has made it fully automatic, but it does involve writing files. The Postgres database is seeded by generating a .csv file (using the csv-writer npm package) and then querying the ‘copy’ command to add the file to the table.
 
-- Node 6.13.0
-- etc
+Indexing does not seem necessary yet as the itemID is automatically indexed as the primary key. Queries for the category are also responsive, even under load.
 
-## Development
+Seeding the database is a lot faster than mongo, at around 130 seconds. 
 
-### Installing Dependencies
+## Routes
 
-From within the root directory:
+For query and load-testing, the same route was tested on the server. However, this route sends one of two possible queries to the databases:
 
-```sh
-npm install -g webpack
-npm install
-```
+- If a parameter is an itemid, one row/document is requested in order to extract the item’s category.
+
+- If a category is provided, 100 rows/documents are requested for other items in that category, capped by the query. Originally this was uncapped and would return all items of a category. This was then capped at 200 but I found it was a taxing query. I’ve now limited it to 100 as it produces around 17 pages of items for the user, which I think is more than enough.
+
+## Query Times
+
+The queries for all four db routes (routed via express in node) are listed below load tested under the specified RPS for one minute:
+
+| RPS | MongoDB Item  (return one document) | MongoDB Category  (return 100 documents) | Postgres Item  (return one document) | Postgres Category  (return 100 documents) |
+|-----|-------------------------------------|------------------------------------------|--------------------------------------|-------------------------------------------|
+| 100 | 4ms                                 | 8.5ms                                    | 9ms => 6.9ms                         | 7.6ms                                     |
+| 200 | 3.5ms                               | 18.8ms                                   | 7.7ms                                | 69.4ms*                                   |
+| 250 |                                     | 3296.7ms                                 |                                      | 739.6ms                                   |
+| 300 | 2.6ms                               | 6076.2ms^                                | 1280.5ms^*                           | 983.1ms^*                                 |
+
+^high error rate
+*crash
+
+It seems mongo is more stable underload. From the above, the recommendation for load balancing would be to make sure that no server is handling more than 200 RPS.
+
+I was able to optimize Postgres a little further after looking at indexing methods, I am now indexing post-seed instead of relying on the primary key which is supposedly more performant.
+
+## Load Testing
+
+A single server is only able to handle less than 300rps when linked to either Postgres or Mongo. Mongo seems to be slightly more performant, especially at higher loads where Postgres seems to default to crashing.
+
+I’ve implemented load balancing via setting up 8 server instances for routes that query the database and although the average query time under light load has increased to roughly 8ms, the server is no longer crashing at high loads. I am able to send 1000 RPS with a high error rate without the server crashing but I am at the limits of my hardware. 
 
