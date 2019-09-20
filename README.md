@@ -6,7 +6,7 @@ The carousel was designed by my colleague Jeff Salinas for a larger e-commerce i
 
 The carousel renders items based on two database queries. The first returns the category of an item based on its Product ID, and the second returns related items that are also in that category.
 
-Our goal was to have our servers able to handle 300 RPS with low latency, and 1000 without crashing.
+Our goal was to have our servers able to handle 300 RPS with low latency, and 1000 RPS without crashing.
 
 
 
